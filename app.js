@@ -13,6 +13,10 @@
   const legacyTemplateInput = document.querySelector("#legacy-template-file");
   const legacyConvertButton = document.querySelector("#legacy-convert");
   const legacyStatus = document.querySelector("#legacy-status");
+  const expenseSourceInput = document.querySelector("#expense-source-file");
+  const expenseTemplateInput = document.querySelector("#expense-template-file");
+  const expenseConvertButton = document.querySelector("#expense-convert");
+  const expenseStatus = document.querySelector("#expense-status");
 
   const mappings = [
     ["C", "C"], ["V", "M"], ["Z", "V"], ["AD", "S"]
@@ -37,6 +41,8 @@
   caseTemplateInput.addEventListener("change", () => updateFile(caseTemplateInput, "#case-template-name", "#case-template-zone", [caseSourceInput, caseTemplateInput], caseConvertButton, caseStatus));
   legacySourceInput.addEventListener("change", () => updateFile(legacySourceInput, "#legacy-source-name", "#legacy-source-zone", [legacySourceInput, legacyTemplateInput], legacyConvertButton, legacyStatus));
   legacyTemplateInput.addEventListener("change", () => updateFile(legacyTemplateInput, "#legacy-template-name", "#legacy-template-zone", [legacySourceInput, legacyTemplateInput], legacyConvertButton, legacyStatus));
+  expenseSourceInput.addEventListener("change", () => updateFile(expenseSourceInput, "#expense-source-name", "#expense-source-zone", [expenseSourceInput, expenseTemplateInput], expenseConvertButton, expenseStatus));
+  expenseTemplateInput.addEventListener("change", () => updateFile(expenseTemplateInput, "#expense-template-name", "#expense-template-zone", [expenseSourceInput, expenseTemplateInput], expenseConvertButton, expenseStatus));
 
   const tabs = [...document.querySelectorAll("[role='tab']")];
   function activateTab(tab) {
@@ -85,6 +91,11 @@
       return value.richText.map((part) => part.text).join("");
     }
     return value;
+  }
+
+  function getCellText(sheet, column, row) {
+    const cell = sheet.getCell(`${column}${row}`);
+    return String(cell.text ?? getCellValue(sheet, column, row) ?? "").trim();
   }
 
   function writeValue(sheet, address, value) {
@@ -143,6 +154,12 @@
     return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}`;
   }
 
+  function normalizeWorkbookView(workbook) {
+    const currentView = workbook.views && workbook.views[0] ? workbook.views[0] : {};
+    workbook.views = [{ ...currentView, activeTab: 0, firstSheet: 0, visibility: "visible" }];
+    if (workbook.worksheets[0]) workbook.worksheets[0].state = "visible";
+  }
+
   async function convertSalary() {
     if (typeof ExcelJS === "undefined") {
       setStatus(status, "Excel 元件未載入，請確認 vendor 資料夾完整", "error");
@@ -179,6 +196,7 @@
       if (!count) throw new Error("資料檔第 4 列之後沒有可轉錄的資料");
 
       const stamp = fileTimestamp();
+      normalizeWorkbookView(templateBook);
       const output = await templateBook.xlsx.writeBuffer();
       downloadWorkbook(output, `轉錄完成_${stamp}.xlsx`);
       setStatus(status, `完成：已轉錄 ${count} 筆資料並開始下載`, "success");
@@ -246,6 +264,7 @@
       if (!vendorCount) throw new Error("在來源第 28 列之後找不到有效的進貨廠商");
 
       const stamp = fileTimestamp();
+      normalizeWorkbookView(templateBook);
       const output = await templateBook.xlsx.writeBuffer();
       downloadWorkbook(output, `案件轉錄完成_${stamp}.xlsx`);
       setStatus(caseStatus, `完成：已產生 1 筆冠新資料與 ${vendorCount} 筆廠商資料`, "success");
@@ -318,6 +337,7 @@
       }
       if (!vendorCount) throw new Error("在來源第 24 列之後找不到有效的進貨廠商");
 
+      normalizeWorkbookView(templateBook);
       const output = await templateBook.xlsx.writeBuffer();
       downloadWorkbook(output, `舊版案件轉錄完成_${fileTimestamp()}.xlsx`);
       const warningText = warnings.length ? `\n已跳過不符規則的欄位和值：${warnings.join("、")}` : "";
@@ -330,7 +350,72 @@
     }
   }
 
+  async function convertExpense() {
+    if (typeof ExcelJS === "undefined") {
+      setStatus(expenseStatus, "Excel 元件未載入，請確認 vendor 資料夾完整", "error");
+      return;
+    }
+    expenseConvertButton.disabled = true;
+    setStatus(expenseStatus, "正在讀取支出明細並建立申請單…");
+    try {
+      const [sourceBook, templateBook] = await Promise.all([
+        readWorkbook(expenseSourceInput.files[0]), readWorkbook(expenseTemplateInput.files[0])
+      ]);
+      const sourceSheet = sourceBook.worksheets[0];
+      const templateSheet = templateBook.worksheets[0];
+      if (!sourceSheet || !templateSheet) throw new Error("Excel 檔案中找不到工作表");
+
+      const details = [];
+      for (let sourceRow = 2; sourceRow <= sourceSheet.rowCount; sourceRow += 1) {
+        const hasDetail = ["B", "C", "D", "E", "F"].some((column) => hasValue(getCellValue(sourceSheet, column, sourceRow)));
+        if (hasDetail) details.push(sourceRow);
+      }
+      if (details.length > 6) throw new Error(`範本最多可容納 6 筆明細，目前共有 ${details.length} 筆`);
+
+      writeValue(templateSheet, "D3", getCellValue(sourceSheet, "A", 2));
+      const vendorCellStyles = [];
+      for (let row = 7; row <= 12; row += 1) {
+        vendorCellStyles.push(JSON.parse(JSON.stringify(templateSheet.getCell(`C${row}`).style || {})));
+      }
+      try { templateSheet.unMergeCells("C7:C12"); } catch (_) { /* 範本若未合併則略過 */ }
+      for (let row = 7; row <= 12; row += 1) {
+        templateSheet.getCell(`C${row}`).style = vendorCellStyles[row - 7];
+      }
+      for (let targetRow = 7; targetRow <= 12; targetRow += 1) {
+        for (const column of ["B", "C", "D", "E", "G", "H", "M"]) writeValue(templateSheet, `${column}${targetRow}`, null);
+      }
+
+      details.forEach((sourceRow, index) => {
+        const targetRow = 7 + index;
+        const invoiceDate = getCellText(sourceSheet, "C", sourceRow);
+        const invoiceNumber = getCellText(sourceSheet, "D", sourceRow);
+        writeValue(templateSheet, `B${targetRow}`, index + 1);
+        if (index === 0) writeValue(templateSheet, `C${targetRow}`, getCellValue(sourceSheet, "B", sourceRow));
+        writeValue(templateSheet, `D${targetRow}`, [invoiceDate, invoiceNumber].filter(Boolean).join(" "));
+        writeValue(templateSheet, `E${targetRow}`, getCellValue(sourceSheet, "E", sourceRow));
+        writeValue(templateSheet, `G${targetRow}`, { formula: `E${targetRow}` });
+        writeValue(templateSheet, `H${targetRow}`, { formula: `G${targetRow}` });
+        writeValue(templateSheet, `M${targetRow}`, getCellValue(sourceSheet, "F", sourceRow));
+      });
+      if (details.length > 1) templateSheet.mergeCells(`C7:C${6 + details.length}`);
+      writeValue(templateSheet, "H13", { formula: "SUM(H2:H12)" });
+      templateBook.calcProperties.fullCalcOnLoad = true;
+      templateBook.calcProperties.forceFullCalc = true;
+
+      normalizeWorkbookView(templateBook);
+      const output = await templateBook.xlsx.writeBuffer();
+      downloadWorkbook(output, `支出申請單_${fileTimestamp()}.xlsx`);
+      setStatus(expenseStatus, `完成：已填入製單日期與 ${details.length} 筆支出明細`, "success");
+    } catch (error) {
+      console.error(error);
+      setStatus(expenseStatus, error instanceof Error ? error.message : "支出單轉錄失敗，請檢查檔案格式", "error");
+    } finally {
+      expenseConvertButton.disabled = !(expenseSourceInput.files[0] && expenseTemplateInput.files[0]);
+    }
+  }
+
   convertButton.addEventListener("click", convertSalary);
   caseConvertButton.addEventListener("click", convertCase);
   legacyConvertButton.addEventListener("click", convertLegacyCase);
+  expenseConvertButton.addEventListener("click", convertExpense);
 })();

@@ -27,7 +27,7 @@ h1 { margin: 0; font-family: Georgia, "Noto Serif TC", serif; font-size: clamp(5
 h1 em { color: var(--accent); font-weight: inherit; }
 .hero p { margin: 0 0 7px; color: var(--muted); line-height: 1.85; font-size: 16px; }
 
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
 .tabs .tab { min-width: 0; padding: 17px 20px; border: 1px solid var(--line); color: var(--muted); background: rgba(255,253,248,.55); text-align: left; font-weight: 800; box-shadow: none; }
 .tabs .tab span { float: none; margin-right: 12px; color: var(--accent); font: 700 12px Georgia, serif; }
 .tabs .tab:hover { transform: none; color: var(--ink); background: var(--card); }
@@ -62,11 +62,13 @@ button span { float: right; }
 button:hover:not(:disabled) { background: #e84722; transform: translateY(-1px); }
 button:disabled { background: #b8b5ae; cursor: not-allowed; }
 #status { margin: 0; color: var(--muted); font-size: 13px; }
-#case-status, #legacy-status { margin: 0; color: var(--muted); font-size: 13px; white-space: pre-line; }
+#case-status, #legacy-status, #expense-status { margin: 0; color: var(--muted); font-size: 13px; white-space: pre-line; }
 #status.error { color: #b62828; font-weight: 700; }
 #status.success { color: var(--green); font-weight: 700; }
-#case-status.error, #legacy-status.error { color: #b62828; font-weight: 700; }
-#case-status.success, #legacy-status.success { color: var(--green); font-weight: 700; }
+#case-status.error, #legacy-status.error, #expense-status.error { color: #b62828; font-weight: 700; }
+#case-status.success, #legacy-status.success, #expense-status.success { color: var(--green); font-weight: 700; }
+.formula-notice { display: flex; align-items: flex-start; gap: 12px; margin-top: 18px; padding: 13px 16px; border-left: 3px solid var(--accent); color: var(--ink); background: #fff4ee; font-size: 13px; line-height: 1.65; }
+.formula-notice strong { flex: 0 0 auto; color: var(--accent); }
 
 .mapping { margin-top: 20px; padding: 26px 30px; box-shadow: none; }
 .section-heading.compact { margin-bottom: 18px; }
@@ -89,6 +91,7 @@ footer { padding: 25px 0 0; text-align: center; color: #838981; font-size: 11px;
   .file-grid { grid-template-columns: 1fr; }
   .connector { height: 40px; transform: rotate(90deg); }
   .actions { grid-template-columns: 1fr; }
+  .formula-notice { flex-direction: column; gap: 3px; }
   button { width: 100%; }
   .section-heading { align-items: flex-start; gap: 14px; }
   .section-heading.compact > span { text-align: right; max-width: 150px; }

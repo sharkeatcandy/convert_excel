@@ -19,6 +19,7 @@
       <button class="tab active" id="salary-tab" role="tab" aria-selected="true" aria-controls="salary-panel" data-panel="salary-panel"><span>01</span>薪資轉錄</button>
       <button class="tab" id="case-tab" role="tab" aria-selected="false" aria-controls="case-panel" data-panel="case-panel"><span>02</span>案件轉錄</button>
       <button class="tab" id="legacy-case-tab" role="tab" aria-selected="false" aria-controls="legacy-case-panel" data-panel="legacy-case-panel"><span>03</span>舊版案件轉錄</button>
+      <button class="tab" id="expense-tab" role="tab" aria-selected="false" aria-controls="expense-panel" data-panel="expense-panel"><span>04</span>支出單轉錄</button>
     </nav>
 
     <div class="tab-panel" id="salary-panel" role="tabpanel" aria-labelledby="salary-tab">
@@ -97,7 +98,7 @@
             <span class="file-index">B</span>
             <span class="file-icon" aria-hidden="true">↗</span>
             <strong>案件空白範本</strong>
-            <span id="case-template-help">選擇「案件空白2.xlsx」</span>
+            <span id="case-template-help">選擇「案件空白範本.xlsx」</span>
             <span class="file-name" id="case-template-name">尚未選擇</span>
           </label>
         </div>
@@ -151,7 +152,7 @@
             <span class="file-index">B</span>
             <span class="file-icon" aria-hidden="true">↗</span>
             <strong>案件空白範本</strong>
-            <span id="legacy-template-help">選擇「案件空白2.xlsx」</span>
+            <span id="legacy-template-help">選擇「案件空白範本.xlsx」</span>
             <span class="file-name" id="legacy-template-name">尚未選擇</span>
           </label>
         </div>
@@ -177,6 +178,63 @@
           <div><b>H5</b><span>總銷貨額</span><i>→</i><b>T</b><span>僅冠新列</span></div>
           <div><b>B/F/D</b><span>廠商／說明／成本</span><i>→</i><b>H/P/U</b><span>廠商／發票／進貨額</span></div>
           <div><b>冠新/廠商</b><span>款項與會計科目</span><i>→</i><b>I/K/L</b><span>收入／成本規則</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="tab-panel" id="expense-panel" role="tabpanel" aria-labelledby="expense-tab" hidden>
+      <section class="workspace" aria-labelledby="expense-workspace-title">
+        <div class="section-heading">
+          <div><span class="step">01</span><h2 id="expense-workspace-title">選擇支出單檔案</h2></div>
+          <span class="privacy">● 本機處理</span>
+        </div>
+
+        <div class="file-grid">
+          <label class="dropzone" id="expense-source-zone">
+            <input type="file" id="expense-source-file" accept=".xlsx" aria-describedby="expense-source-help">
+            <span class="file-index">A</span>
+            <span class="file-icon" aria-hidden="true">↗</span>
+            <strong>支出單資料</strong>
+            <span id="expense-source-help">選擇「支出單資料.xlsx」</span>
+            <span class="file-name" id="expense-source-name">尚未選擇</span>
+          </label>
+
+          <div class="connector" aria-hidden="true"><span>→</span></div>
+
+          <label class="dropzone" id="expense-template-zone">
+            <input type="file" id="expense-template-file" accept=".xlsx" aria-describedby="expense-template-help">
+            <span class="file-index">B</span>
+            <span class="file-icon" aria-hidden="true">↗</span>
+            <strong>支出申請單範本</strong>
+            <span id="expense-template-help">選擇「支出申請單範本.xlsx」</span>
+            <span class="file-name" id="expense-template-name">尚未選擇</span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="expense-convert" disabled>產生支出申請單 <span>→</span></button>
+          <p id="expense-status" role="status" aria-live="polite">請先選擇兩個 Excel 檔案</p>
+        </div>
+        <div class="formula-notice" role="note">
+          <strong>Excel 公式提醒</strong>
+          <span>G、H 與合計欄為公式；下載後請在 Excel 點選「啟用編輯」，數字才會計算並顯示。</span>
+        </div>
+      </section>
+
+      <section class="mapping" aria-labelledby="expense-mapping-title">
+        <div class="section-heading compact">
+          <div><span class="step">02</span><h2 id="expense-mapping-title">支出單轉錄規則</h2></div>
+          <span>支援最多 6 筆明細</span>
+        </div>
+        <div class="rules case-rules">
+          <div><b>A2</b><span>製單日期</span><i>→</i><b>D3</b><span>支出日期</span></div>
+          <div><b>B</b><span>廠商</span><i>→</i><b>C</b><span>依明細列數合併</span></div>
+          <div><b>C + D</b><span>日期與發票號碼</span><i>→</i><b>D</b><span>空格串接</span></div>
+          <div><b>E</b><span>金額</span><i>→</i><b>E</b><span>發票／收據金額</span></div>
+          <div><b>F</b><span>單號</span><i>→</i><b>M</b><span>單號</span></div>
+          <div><b>1…6</b><span>明細順序</span><i>→</i><b>B</b><span>流水號</span></div>
+          <div><b>E列</b><span>明細金額</span><i>→</i><b>G/H</b><span>逐列公式</span></div>
+          <div><b>H2:H12</b><span>上方所有 H</span><i>→</i><b>H13</b><span>加總公式</span></div>
         </div>
       </section>
     </div>
