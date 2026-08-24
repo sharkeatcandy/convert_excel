@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在瀏覽器本機完成薪資 Excel 欄位轉錄，不上傳任何資料。">
+  <title>薪資資料轉錄工具</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="eyebrow"><span></span> LOCAL EXCEL CONVERTER</div>
+      <h1>薪資資料，<br><em>安全轉錄。</em></h1>
+      <p>選擇來源資料與空白範本，所有處理只在你的瀏覽器內完成。檔案不會離開這台電腦。</p>
+    </header>
+
+    <section class="workspace" aria-labelledby="workspace-title">
+      <div class="section-heading">
+        <div><span class="step">01</span><h2 id="workspace-title">選擇檔案</h2></div>
+        <span class="privacy">● 本機處理</span>
+      </div>
+
+      <div class="file-grid">
+        <label class="dropzone" id="source-zone">
+          <input type="file" id="source-file" accept=".xlsx,.xls" aria-describedby="source-help">
+          <span class="file-index">A</span>
+          <span class="file-icon" aria-hidden="true">↗</span>
+          <strong>資料檔</strong>
+          <span id="source-help">選擇「資料.xlsx」</span>
+          <span class="file-name" id="source-name">尚未選擇</span>
+        </label>
+
+        <div class="connector" aria-hidden="true"><span>→</span></div>
+
+        <label class="dropzone" id="template-zone">
+          <input type="file" id="template-file" accept=".xlsx,.xls" aria-describedby="template-help">
+          <span class="file-index">B</span>
+          <span class="file-icon" aria-hidden="true">↗</span>
+          <strong>空白範本</strong>
+          <span id="template-help">選擇「空白檔.xlsx」</span>
+          <span class="file-name" id="template-name">尚未選擇</span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="convert" disabled>產生轉錄檔案 <span>→</span></button>
+        <p id="status" role="status" aria-live="polite">請先選擇兩個 Excel 檔案</p>
+      </div>
+    </section>
+
+    <section class="mapping" aria-labelledby="mapping-title">
+      <div class="section-heading compact">
+        <div><span class="step">02</span><h2 id="mapping-title">轉錄規則</h2></div>
+        <span>來源第 4 列開始 → 範本第 2 列開始</span>
+      </div>
+      <div class="rules">
+        <div><b>C</b><span>姓名</span><i>→</i><b>C</b><span>所得人姓名</span></div>
+        <div><b>S+T−AE</b><span>計算結果</span><i>→</i><b>L</b><span>薪資</span></div>
+        <div><b>V</b><span>年終獎金</span><i>→</i><b>M</b><span>年終獎金</span></div>
+        <div><b>W+AN</b><span>計算結果</span><i>→</i><b>N</b><span>獎金</span></div>
+        <div><b>Z</b><span>加班小計</span><i>→</i><b>V</b><span>免稅加班</span></div>
+        <div><b>AD</b><span>所得稅</span><i>→</i><b>S</b><span>所得稅</span></div>
+        <div class="date-rule"><b>B</b><span>2026年1月份</span><i>→</i><b>J / K</b><span>115 / 1</span></div>
+      </div>
+    </section>
+
+    <footer>支援 .xlsx · 資料不經網路傳輸 · 可離線使用</footer>
+  </main>
+  <script src="vendor/exceljs.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
