@@ -111,17 +111,18 @@
       <section class="mapping" aria-labelledby="case-mapping-title">
         <div class="section-heading compact">
           <div><span class="step">02</span><h2 id="case-mapping-title">案件轉錄規則</h2></div>
-          <span>每個有效進貨廠商產生一列</span>
+          <span>先產生冠新列，再接續廠商列</span>
         </div>
         <div class="rules case-rules">
           <div><b>C2</b><span>案件負責人</span><i>→</i><b>B</b><span>案件負責人</span></div>
           <div><b>H10</b><span>案件類別</span><i>→</i><b>C</b><span>案件類別</span></div>
           <div><b>H3</b><span>冠新銷單</span><i>→</i><b>D</b><span>冠新銷單</span></div>
           <div><b>D3</b><span>案件說明</span><i>→</i><b>E</b><span>案件說明</span></div>
-          <div><b>C4</b><span>客戶名稱</span><i>→</i><b>F</b><span>客戶名稱</span></div>
-          <div><b>C17</b><span>客戶訂單號碼</span><i>→</i><b>G</b><span>客戶訂單號碼</span></div>
-          <div><b>H5</b><span>總銷貨額</span><i>→</i><b>T</b><span>總銷貨額</span></div>
+          <div><b>L4</b><span>客戶名稱</span><i>→</i><b>F</b><span>客戶名稱</span></div>
+          <div><b>C17</b><span>客戶訂單號碼</span><i>→</i><b>G</b><span>僅冠新列</span></div>
+          <div><b>H5</b><span>總銷貨額</span><i>→</i><b>T</b><span>僅冠新列</span></div>
           <div><b>B/C/D</b><span>進貨廠商資料</span><i>→</i><b>H/P/U</b><span>廠商／發票／進貨額</span></div>
+          <div><b>冠新/廠商</b><span>款項與會計科目</span><i>→</i><b>I/K/L</b><span>收入／成本規則</span></div>
         </div>
       </section>
     </div>
@@ -164,17 +165,18 @@
       <section class="mapping" aria-labelledby="legacy-mapping-title">
         <div class="section-heading compact">
           <div><span class="step">02</span><h2 id="legacy-mapping-title">舊版案件規則</h2></div>
-          <span>動態讀取第 24 列起的進貨廠商</span>
+          <span>先產生冠新列，再接續廠商列</span>
         </div>
         <div class="rules case-rules">
           <div><b>C2</b><span>案件負責人</span><i>→</i><b>B</b><span>案件負責人</span></div>
           <div><b>H10</b><span>案件類別</span><i>→</i><b>C</b><span>案件類別</span></div>
           <div><b>H3</b><span>冠新銷單</span><i>→</i><b>D</b><span>冠新銷單</span></div>
           <div><b>C5</b><span>案件說明</span><i>→</i><b>E</b><span>案件說明</span></div>
-          <div><b>C5</b><span>第二個底線後十位數</span><i>→</i><b>G</b><span>客戶訂單號碼</span></div>
+          <div><b>C5</b><span>第二個底線後十位數</span><i>→</i><b>G</b><span>僅冠新列</span></div>
           <div><b>C4</b><span>客戶名稱</span><i>→</i><b>F</b><span>客戶名稱</span></div>
-          <div><b>H5</b><span>總銷貨額</span><i>→</i><b>T</b><span>總銷貨額</span></div>
+          <div><b>H5</b><span>總銷貨額</span><i>→</i><b>T</b><span>僅冠新列</span></div>
           <div><b>B/F/D</b><span>廠商／說明／成本</span><i>→</i><b>H/P/U</b><span>廠商／發票／進貨額</span></div>
+          <div><b>冠新/廠商</b><span>款項與會計科目</span><i>→</i><b>I/K/L</b><span>收入／成本規則</span></div>
         </div>
       </section>
     </div>

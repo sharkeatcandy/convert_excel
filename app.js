@@ -211,27 +211,44 @@
 
       const commonMappings = [
         ["C2", "B"], ["H10", "C"], ["H3", "D"], ["D3", "E"],
-        ["C4", "F"], ["C17", "G"], ["H5", "T"]
+        ["L4", "F"]
       ];
       let targetRow = 2;
+      for (const [sourceAddress, targetColumn] of commonMappings) {
+        writeValue(templateSheet, `${targetColumn}${targetRow}`, getCellValue(sourceSheet, sourceAddress.match(/[A-Z]+/)[0], Number(sourceAddress.match(/\d+/)[0])));
+      }
+      writeValue(templateSheet, `G${targetRow}`, getCellValue(sourceSheet, "C", 17));
+      writeValue(templateSheet, `H${targetRow}`, "冠新");
+      writeValue(templateSheet, `I${targetRow}`, "004銷貨收入");
+      writeValue(templateSheet, `K${targetRow}`, "銀行存款");
+      writeValue(templateSheet, `L${targetRow}`, "應收帳款");
+      writeValue(templateSheet, `T${targetRow}`, getCellValue(sourceSheet, "H", 5));
+      writeValue(templateSheet, `U${targetRow}`, null);
+      targetRow += 1;
+      let vendorCount = 0;
       for (let sourceRow = 28; sourceRow <= sourceSheet.rowCount; sourceRow += 2) {
         const vendor = getCellValue(sourceSheet, "B", sourceRow) ?? getCellValue(sourceSheet, "M", sourceRow);
         if (!hasValue(vendor)) continue;
         for (const [sourceAddress, targetColumn] of commonMappings) {
           writeValue(templateSheet, `${targetColumn}${targetRow}`, getCellValue(sourceSheet, sourceAddress.match(/[A-Z]+/)[0], Number(sourceAddress.match(/\d+/)[0])));
         }
+        writeValue(templateSheet, `G${targetRow}`, null);
         writeValue(templateSheet, `H${targetRow}`, vendor);
+        writeValue(templateSheet, `I${targetRow}`, "004銷貨成本");
+        writeValue(templateSheet, `K${targetRow}`, "應付帳款");
+        writeValue(templateSheet, `L${targetRow}`, "銀行存款");
         writeValue(templateSheet, `P${targetRow}`, getCellValue(sourceSheet, "C", sourceRow));
+        writeValue(templateSheet, `T${targetRow}`, null);
         writeValue(templateSheet, `U${targetRow}`, getCellValue(sourceSheet, "D", sourceRow));
         targetRow += 1;
+        vendorCount += 1;
       }
-      const count = targetRow - 2;
-      if (!count) throw new Error("在來源第 28 列之後找不到有效的進貨廠商");
+      if (!vendorCount) throw new Error("在來源第 28 列之後找不到有效的進貨廠商");
 
       const stamp = fileTimestamp();
       const output = await templateBook.xlsx.writeBuffer();
       downloadWorkbook(output, `案件轉錄完成_${stamp}.xlsx`);
-      setStatus(caseStatus, `完成：已依 ${count} 個進貨廠商產生 ${count} 筆資料`, "success");
+      setStatus(caseStatus, `完成：已產生 1 筆冠新資料與 ${vendorCount} 筆廠商資料`, "success");
     } catch (error) {
       console.error(error);
       setStatus(caseStatus, error instanceof Error ? error.message : "案件轉錄失敗，請檢查檔案格式", "error");
@@ -263,32 +280,48 @@
 
       const commonMappings = [
         ["C2", "B"], ["H10", "C"], ["H3", "D"], ["C5", "E"],
-        ["C4", "F"], ["H5", "T"]
+        ["C4", "F"]
       ];
       const range = XLSX.utils.decode_range(sourceSheet["!ref"] || "A1");
       let targetRow = 2;
+      for (const [sourceAddress, targetColumn] of commonMappings) {
+        writeValue(templateSheet, `${targetColumn}${targetRow}`, getLegacyValue(sourceSheet, sourceAddress));
+      }
+      writeValue(templateSheet, `G${targetRow}`, orderNumber);
+      writeValue(templateSheet, `H${targetRow}`, "冠新");
+      writeValue(templateSheet, `I${targetRow}`, "004銷貨收入");
+      writeValue(templateSheet, `K${targetRow}`, "銀行存款");
+      writeValue(templateSheet, `L${targetRow}`, "應收帳款");
+      writeValue(templateSheet, `T${targetRow}`, getLegacyValue(sourceSheet, "H5"));
+      writeValue(templateSheet, `U${targetRow}`, null);
+      targetRow += 1;
+      let vendorCount = 0;
       for (let sourceRow = 24; sourceRow <= range.e.r + 1; sourceRow += 1) {
         const vendor = getLegacyValue(sourceSheet, `B${sourceRow}`);
         if (!hasValue(vendor)) continue;
         for (const [sourceAddress, targetColumn] of commonMappings) {
           writeValue(templateSheet, `${targetColumn}${targetRow}`, getLegacyValue(sourceSheet, sourceAddress));
         }
-        writeValue(templateSheet, `G${targetRow}`, orderNumber);
+        writeValue(templateSheet, `G${targetRow}`, null);
         writeValue(templateSheet, `H${targetRow}`, vendor);
+        writeValue(templateSheet, `I${targetRow}`, "004銷貨成本");
+        writeValue(templateSheet, `K${targetRow}`, "應付帳款");
+        writeValue(templateSheet, `L${targetRow}`, "銀行存款");
         const invoiceSource = String(getLegacyValue(sourceSheet, `F${sourceRow}`) ?? "");
         const invoiceMatch = invoiceSource.match(/\b[A-Za-z]{2}\d{8}\b/);
         if (invoiceMatch) writeValue(templateSheet, `P${targetRow}`, invoiceMatch[0]);
         else warnings.push(`F${sourceRow}：「${invoiceSource || "空白"}」`);
+        writeValue(templateSheet, `T${targetRow}`, null);
         writeValue(templateSheet, `U${targetRow}`, getLegacyValue(sourceSheet, `D${sourceRow}`));
         targetRow += 1;
+        vendorCount += 1;
       }
-      const count = targetRow - 2;
-      if (!count) throw new Error("在來源第 24 列之後找不到有效的進貨廠商");
+      if (!vendorCount) throw new Error("在來源第 24 列之後找不到有效的進貨廠商");
 
       const output = await templateBook.xlsx.writeBuffer();
       downloadWorkbook(output, `舊版案件轉錄完成_${fileTimestamp()}.xlsx`);
       const warningText = warnings.length ? `\n已跳過不符規則的欄位和值：${warnings.join("、")}` : "";
-      setStatus(legacyStatus, `完成：已依 ${count} 個進貨廠商產生 ${count} 筆資料${warningText}`, "success");
+      setStatus(legacyStatus, `完成：已產生 1 筆冠新資料與 ${vendorCount} 筆廠商資料${warningText}`, "success");
     } catch (error) {
       console.error(error);
       setStatus(legacyStatus, error instanceof Error ? error.message : "舊版案件轉錄失敗，請檢查檔案格式", "error");

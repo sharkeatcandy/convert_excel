@@ -19,14 +19,26 @@ function value(sheet, column, row) {
   const source = sourceBook.worksheets[0];
   const target = templateBook.worksheets[0];
   const headerStyle = target.getCell("B1").style;
-  const common = [["C", 2, "B"], ["H", 10, "C"], ["H", 3, "D"], ["D", 3, "E"], ["C", 4, "F"], ["C", 17, "G"], ["H", 5, "T"]];
+  const common = [["C", 2, "B"], ["H", 10, "C"], ["H", 3, "D"], ["D", 3, "E"], ["L", 4, "F"]];
   let targetRow = 2;
+
+  for (const [column, row, targetColumn] of common) target.getCell(`${targetColumn}${targetRow}`).value = value(source, column, row);
+  target.getCell(`G${targetRow}`).value = value(source, "C", 17);
+  target.getCell(`H${targetRow}`).value = "冠新";
+  target.getCell(`I${targetRow}`).value = "004銷貨收入";
+  target.getCell(`K${targetRow}`).value = "銀行存款";
+  target.getCell(`L${targetRow}`).value = "應收帳款";
+  target.getCell(`T${targetRow}`).value = value(source, "H", 5);
+  targetRow += 1;
 
   for (let sourceRow = 28; sourceRow <= source.rowCount; sourceRow += 2) {
     const vendor = value(source, "B", sourceRow) ?? value(source, "M", sourceRow);
     if (vendor === null || vendor === undefined || String(vendor).trim() === "") continue;
     for (const [column, row, targetColumn] of common) target.getCell(`${targetColumn}${targetRow}`).value = value(source, column, row);
     target.getCell(`H${targetRow}`).value = vendor;
+    target.getCell(`I${targetRow}`).value = "004銷貨成本";
+    target.getCell(`K${targetRow}`).value = "應付帳款";
+    target.getCell(`L${targetRow}`).value = "銀行存款";
     target.getCell(`P${targetRow}`).value = value(source, "C", sourceRow);
     target.getCell(`U${targetRow}`).value = value(source, "D", sourceRow);
     targetRow += 1;
@@ -37,19 +49,30 @@ function value(sheet, column, row) {
   await roundTrip.xlsx.load(output);
   const result = roundTrip.worksheets[0];
 
-  assert.strictEqual(targetRow - 2, 2);
+  assert.strictEqual(targetRow - 2, 3);
   assert.strictEqual(result.getCell("B2").value, "林文洪");
   assert.strictEqual(result.getCell("C2").value, "含軟硬體銷售");
   assert.strictEqual(result.getCell("D2").value, "NO2026082302");
-  assert.strictEqual(result.getCell("H2").value, "精技");
-  assert.strictEqual(result.getCell("U2").value, 2363);
-  assert.strictEqual(result.getCell("H3").value, "原價屋");
-  assert.strictEqual(result.getCell("P3").value, "DD68551026");
-  assert.strictEqual(result.getCell("U3").value, 70370);
+  assert.strictEqual(result.getCell("F2").value, "新光醫院");
+  assert.strictEqual(result.getCell("G2").value, 5100002564);
+  assert.strictEqual(result.getCell("H2").value, "冠新");
+  assert.strictEqual(result.getCell("I2").value, "004銷貨收入");
+  assert.strictEqual(result.getCell("K2").value, "銀行存款");
+  assert.strictEqual(result.getCell("L2").value, "應收帳款");
+  assert.strictEqual(result.getCell("H3").value, "精技");
+  assert.strictEqual(result.getCell("I3").value, "004銷貨成本");
+  assert.strictEqual(result.getCell("K3").value, "應付帳款");
+  assert.strictEqual(result.getCell("L3").value, "銀行存款");
+  assert.strictEqual(result.getCell("G3").value, null);
+  assert.strictEqual(result.getCell("T3").value, null);
+  assert.strictEqual(result.getCell("U3").value, 2363);
+  assert.strictEqual(result.getCell("H4").value, "原價屋");
+  assert.strictEqual(result.getCell("P4").value, "DD68551026");
+  assert.strictEqual(result.getCell("U4").value, 70370);
   assert.strictEqual(result.getCell("T2").value, 76500);
   assert.deepStrictEqual(result.getCell("B1").style, headerStyle);
 
-  console.log("PASS: 2 vendors; case mappings and header styles survived XLSX round-trip");
+  console.log("PASS: 1 crown row + 2 vendor rows; case mappings and header styles survived XLSX round-trip");
 })().catch((error) => {
   console.error(error);
   process.exitCode = 1;
