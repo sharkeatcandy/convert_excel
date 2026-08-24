@@ -3,18 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="在瀏覽器本機完成薪資 Excel 欄位轉錄，不上傳任何資料。">
-  <title>薪資資料轉錄工具</title>
+  <meta name="description" content="在瀏覽器本機完成 Excel 欄位轉錄，不上傳任何資料。">
+  <title>Excel 資料轉錄工具</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="shell">
     <header class="hero">
       <div class="eyebrow"><span></span> LOCAL EXCEL CONVERTER</div>
-      <h1>薪資資料，<br><em>安全轉錄。</em></h1>
+      <h1>Excel 資料，<br><em>安全轉錄。</em></h1>
       <p>選擇來源資料與空白範本，所有處理只在你的瀏覽器內完成。檔案不會離開這台電腦。</p>
     </header>
 
+    <nav class="tabs" role="tablist" aria-label="選擇轉錄機制">
+      <button class="tab active" id="salary-tab" role="tab" aria-selected="true" aria-controls="salary-panel" data-panel="salary-panel"><span>01</span>薪資轉錄</button>
+      <button class="tab" id="case-tab" role="tab" aria-selected="false" aria-controls="case-panel" data-panel="case-panel"><span>02</span>案件轉錄</button>
+      <button class="tab" id="legacy-case-tab" role="tab" aria-selected="false" aria-controls="legacy-case-panel" data-panel="legacy-case-panel"><span>03</span>舊版案件轉錄</button>
+    </nav>
+
+    <div class="tab-panel" id="salary-panel" role="tabpanel" aria-labelledby="salary-tab">
     <section class="workspace" aria-labelledby="workspace-title">
       <div class="section-heading">
         <div><span class="step">01</span><h2 id="workspace-title">選擇檔案</h2></div>
@@ -64,9 +71,117 @@
         <div class="date-rule"><b>B</b><span>2026年1月份</span><i>→</i><b>J / K</b><span>115 / 1</span></div>
       </div>
     </section>
+    </div>
 
-    <footer>支援 .xlsx · 資料不經網路傳輸 · 可離線使用</footer>
+    <div class="tab-panel" id="case-panel" role="tabpanel" aria-labelledby="case-tab" hidden>
+      <section class="workspace" aria-labelledby="case-workspace-title">
+        <div class="section-heading">
+          <div><span class="step">01</span><h2 id="case-workspace-title">選擇案件檔案</h2></div>
+          <span class="privacy">● 本機處理</span>
+        </div>
+
+        <div class="file-grid">
+          <label class="dropzone" id="case-source-zone">
+            <input type="file" id="case-source-file" accept=".xlsx" aria-describedby="case-source-help">
+            <span class="file-index">A</span>
+            <span class="file-icon" aria-hidden="true">↗</span>
+            <strong>業務訂單成立表格</strong>
+            <span id="case-source-help">選擇業務訂單 .xlsx</span>
+            <span class="file-name" id="case-source-name">尚未選擇</span>
+          </label>
+
+          <div class="connector" aria-hidden="true"><span>→</span></div>
+
+          <label class="dropzone" id="case-template-zone">
+            <input type="file" id="case-template-file" accept=".xlsx" aria-describedby="case-template-help">
+            <span class="file-index">B</span>
+            <span class="file-icon" aria-hidden="true">↗</span>
+            <strong>案件空白範本</strong>
+            <span id="case-template-help">選擇「案件空白2.xlsx」</span>
+            <span class="file-name" id="case-template-name">尚未選擇</span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="case-convert" disabled>產生案件轉錄檔 <span>→</span></button>
+          <p id="case-status" role="status" aria-live="polite">請先選擇兩個 Excel 檔案</p>
+        </div>
+      </section>
+
+      <section class="mapping" aria-labelledby="case-mapping-title">
+        <div class="section-heading compact">
+          <div><span class="step">02</span><h2 id="case-mapping-title">案件轉錄規則</h2></div>
+          <span>每個有效進貨廠商產生一列</span>
+        </div>
+        <div class="rules case-rules">
+          <div><b>C2</b><span>案件負責人</span><i>→</i><b>B</b><span>案件負責人</span></div>
+          <div><b>H10</b><span>案件類別</span><i>→</i><b>C</b><span>案件類別</span></div>
+          <div><b>H3</b><span>冠新銷單</span><i>→</i><b>D</b><span>冠新銷單</span></div>
+          <div><b>D3</b><span>案件說明</span><i>→</i><b>E</b><span>案件說明</span></div>
+          <div><b>C4</b><span>客戶名稱</span><i>→</i><b>F</b><span>客戶名稱</span></div>
+          <div><b>C17</b><span>客戶訂單號碼</span><i>→</i><b>G</b><span>客戶訂單號碼</span></div>
+          <div><b>H5</b><span>總銷貨額</span><i>→</i><b>T</b><span>總銷貨額</span></div>
+          <div><b>B/C/D</b><span>進貨廠商資料</span><i>→</i><b>H/P/U</b><span>廠商／發票／進貨額</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="tab-panel" id="legacy-case-panel" role="tabpanel" aria-labelledby="legacy-case-tab" hidden>
+      <section class="workspace" aria-labelledby="legacy-workspace-title">
+        <div class="section-heading">
+          <div><span class="step">01</span><h2 id="legacy-workspace-title">選擇舊版案件檔案</h2></div>
+          <span class="privacy">● 本機處理</span>
+        </div>
+
+        <div class="file-grid">
+          <label class="dropzone" id="legacy-source-zone">
+            <input type="file" id="legacy-source-file" accept=".xls" aria-describedby="legacy-source-help">
+            <span class="file-index">A</span>
+            <span class="file-icon" aria-hidden="true">↗</span>
+            <strong>舊版業務訂單</strong>
+            <span id="legacy-source-help">選擇業務訂單 .xls</span>
+            <span class="file-name" id="legacy-source-name">尚未選擇</span>
+          </label>
+
+          <div class="connector" aria-hidden="true"><span>→</span></div>
+
+          <label class="dropzone" id="legacy-template-zone">
+            <input type="file" id="legacy-template-file" accept=".xlsx" aria-describedby="legacy-template-help">
+            <span class="file-index">B</span>
+            <span class="file-icon" aria-hidden="true">↗</span>
+            <strong>案件空白範本</strong>
+            <span id="legacy-template-help">選擇「案件空白2.xlsx」</span>
+            <span class="file-name" id="legacy-template-name">尚未選擇</span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="legacy-convert" disabled>產生舊版案件轉錄檔 <span>→</span></button>
+          <p id="legacy-status" role="status" aria-live="polite">請先選擇兩個 Excel 檔案</p>
+        </div>
+      </section>
+
+      <section class="mapping" aria-labelledby="legacy-mapping-title">
+        <div class="section-heading compact">
+          <div><span class="step">02</span><h2 id="legacy-mapping-title">舊版案件規則</h2></div>
+          <span>動態讀取第 24 列起的進貨廠商</span>
+        </div>
+        <div class="rules case-rules">
+          <div><b>C2</b><span>案件負責人</span><i>→</i><b>B</b><span>案件負責人</span></div>
+          <div><b>H10</b><span>案件類別</span><i>→</i><b>C</b><span>案件類別</span></div>
+          <div><b>H3</b><span>冠新銷單</span><i>→</i><b>D</b><span>冠新銷單</span></div>
+          <div><b>C5</b><span>案件說明</span><i>→</i><b>E</b><span>案件說明</span></div>
+          <div><b>C5</b><span>第二個底線後十位數</span><i>→</i><b>G</b><span>客戶訂單號碼</span></div>
+          <div><b>C4</b><span>客戶名稱</span><i>→</i><b>F</b><span>客戶名稱</span></div>
+          <div><b>H5</b><span>總銷貨額</span><i>→</i><b>T</b><span>總銷貨額</span></div>
+          <div><b>B/F/D</b><span>廠商／說明／成本</span><i>→</i><b>H/P/U</b><span>廠商／發票／進貨額</span></div>
+        </div>
+      </section>
+    </div>
+
+    <footer>支援 .xlsx / .xls · 資料不經網路傳輸 · 可離線使用</footer>
   </main>
+  <script src="vendor/xlsx.full.min.js"></script>
   <script src="vendor/exceljs.min.js"></script>
   <script src="app.js"></script>
 </body>

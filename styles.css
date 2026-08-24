@@ -27,6 +27,14 @@ h1 { margin: 0; font-family: Georgia, "Noto Serif TC", serif; font-size: clamp(5
 h1 em { color: var(--accent); font-weight: inherit; }
 .hero p { margin: 0 0 7px; color: var(--muted); line-height: 1.85; font-size: 16px; }
 
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+.tabs .tab { min-width: 0; padding: 17px 20px; border: 1px solid var(--line); color: var(--muted); background: rgba(255,253,248,.55); text-align: left; font-weight: 800; box-shadow: none; }
+.tabs .tab span { float: none; margin-right: 12px; color: var(--accent); font: 700 12px Georgia, serif; }
+.tabs .tab:hover { transform: none; color: var(--ink); background: var(--card); }
+.tabs .tab.active { border-color: var(--ink); color: white; background: var(--ink); }
+.tabs .tab.active span { color: #ff8a6d; }
+.tab-panel[hidden] { display: none; }
+
 .workspace, .mapping { background: var(--card); border: 1px solid var(--line); box-shadow: 0 22px 60px rgba(31,42,35,.07); }
 .workspace { padding: 30px; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
@@ -54,8 +62,11 @@ button span { float: right; }
 button:hover:not(:disabled) { background: #e84722; transform: translateY(-1px); }
 button:disabled { background: #b8b5ae; cursor: not-allowed; }
 #status { margin: 0; color: var(--muted); font-size: 13px; }
+#case-status, #legacy-status { margin: 0; color: var(--muted); font-size: 13px; white-space: pre-line; }
 #status.error { color: #b62828; font-weight: 700; }
 #status.success { color: var(--green); font-weight: 700; }
+#case-status.error, #legacy-status.error { color: #b62828; font-weight: 700; }
+#case-status.success, #legacy-status.success { color: var(--green); font-weight: 700; }
 
 .mapping { margin-top: 20px; padding: 26px 30px; box-shadow: none; }
 .section-heading.compact { margin-bottom: 18px; }
@@ -73,6 +84,8 @@ footer { padding: 25px 0 0; text-align: center; color: #838981; font-size: 11px;
   .eyebrow { grid-column: auto; }
   h1 { font-size: clamp(48px, 15vw, 68px); }
   .workspace, .mapping { padding: 20px; }
+  .tabs .tab { padding: 14px 12px; font-size: 13px; }
+  .tabs .tab span { display: block; margin: 0 0 4px; }
   .file-grid { grid-template-columns: 1fr; }
   .connector { height: 40px; transform: rotate(90deg); }
   .actions { grid-template-columns: 1fr; }
