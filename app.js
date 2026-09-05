@@ -255,7 +255,11 @@
         writeValue(templateSheet, `I${targetRow}`, "004銷貨成本");
         writeValue(templateSheet, `K${targetRow}`, "應付帳款");
         writeValue(templateSheet, `L${targetRow}`, "銀行存款");
-        writeValue(templateSheet, `P${targetRow}`, getCellValue(sourceSheet, "C", sourceRow));
+        const invoiceSource = String(getCellValue(sourceSheet, "C", sourceRow) ?? "");
+        const invoiceMatch = invoiceSource.match(/(?:^|[^A-Za-z0-9])([A-Za-z]{2}\d+)(?![A-Za-z0-9])/);
+        const dateMatch = invoiceSource.match(/(?:^|[^0-9])(\d{3}\.\d{1,2}\.\d{1,2})(?![0-9])/);
+        writeValue(templateSheet, `P${targetRow}`, invoiceMatch ? invoiceMatch[1] : null);
+        writeValue(templateSheet, `O${targetRow}`, dateMatch ? dateMatch[1] : null);
         writeValue(templateSheet, `T${targetRow}`, null);
         writeValue(templateSheet, `U${targetRow}`, getCellValue(sourceSheet, "D", sourceRow));
         targetRow += 1;
